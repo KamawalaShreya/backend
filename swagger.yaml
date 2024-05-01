@@ -1,0 +1,511 @@
+openapi: 3.0.0
+
+info:
+  title: API Title
+  description: OpenAPI specification
+  version: 1.0.0
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: integer
+          example: 6630822aaa2193768303e533
+        fullName:
+          type: string
+          maxLength: 260
+          example: Shreya Kamawala
+        email:
+          type: string
+          example: shreya@mailinator.com
+        profilePicture:
+          type: string
+          example: http://example.com/static/file_697929e031dfb468c04126e26845f03c1610166680033.jpeg
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    success:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: success
+
+    GetLoginResponse:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  _id:
+                    type: integer
+                    example: 1
+                  fullName:
+                    type: string
+                    maxLength: 26
+                    example: Shreya Kamawala
+                  email:
+                    type: string
+                    example: shreya@mailinator.com
+                  profilePicture:
+                    type: string
+                    example: http://example.com/static/file_697929e031dfb468c04126e26845f03c1610166680033.jpeg
+                  auth:
+                    type: object
+                    properties:
+                      tokenType:
+                        type: string
+                        example: Bearer
+                      accessToken:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjo1LCJwaG9uZV9udW1iZXIiOiIrOTEgNzk5MDA1MzE3MCIsImZpcnN0X25hbWUiOiJ0ZXN0c2RzZHNkc2RzZHNkcyIsI
+                      refreshToken:
+                        type: string
+                        example: DGptc0miW9AXKCDl6H7RMMHlDcruUbPrwOowslSHiVOyYYJeFhRW1F2XKIrrfUCRIoG1lRMUfEQKSxX3TApl1Aw6641YkAGJhi6yQgr06PrZZuPFddYBvr
+                      expiresIn:
+                        type: integer
+                        example: 31536000
+    User:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  _id:
+                    type: integer
+                    example: 1
+                  fullName:
+                    type: string
+                    maxLength: 26
+                    example: Shreya Kamawala
+                  email:
+                    type: string
+                    example: shreya@mailinator.com
+                  profilePicture:
+                    type: string
+                    example: http://example.com/static/file_697929e031dfb468c04126e26845f03c1610166680033.jpeg
+
+    UnauthorizedError:
+      description: |
+        - Invalid credentials
+        - Expired access or refresh token
+        - Revoked access or refresh token
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Unauthorized
+    NoContent:
+      description: |
+        - Empty body content
+      content:
+        application/json:
+          schema:
+            type: object
+    UnprocessableEntity:
+      description: Validation errors
+      content:
+        application/json:
+          schema:
+            type: object
+    Conflict:
+      description: Account already registered with given email
+      content:
+        application/json:
+          schema:
+            type: object
+    PreconditionFailedException:
+      description: Account does not exist
+      content:
+        application/json:
+          schema:
+            type: object
+paths:
+  /auth/register:
+    post:
+      summary: Register Service
+      description: Register Service
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                  example: Shreya Kamawala
+                email:
+                  type: string
+                  example: shreya@mailinator.com
+                password:
+                  type: string
+                  example: "password@123"
+                confirmPassword:
+                  type: string
+                  example: "password@123"
+                profileImage:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          $ref: "#/components/responses/success"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedException"
+
+  /auth/login:
+    post:
+      summary: Login Service
+      description: Login Service
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: shreya@mailinator.com
+                password:
+                  type: string
+                  example: "password@123"
+
+      responses:
+        "200":
+          $ref: "#/components/responses/success"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedException"
+
+  /auth/logout:
+    post:
+      description: Logout from the application
+      summary: Logout from the application
+      tags:
+        - Auth
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/success"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  # /user:
+  #   get:
+  #     summary: Get profile details
+  #     tags:
+  #       - User
+  #     security:
+  #       - bearerAuth: []
+  #     responses:
+  #       "401":
+  #         $ref: "#/components/responses/UnauthorizedError"
+  #       "422":
+  #         $ref: "#/components/responses/UnprocessableEntity"
+  #       "200":
+  #         $ref: "#/components/responses/User"
+
+  /product:
+    get:
+      summary: Get Products
+      description: |
+        - If send userId than get particular user products otherwise all
+        - only send that query parameter which you want if for price and category than send this only 
+        - PriceRange - ex. - 0-100(always pass like this)
+        - sortBy - 1- sort by created_at 2- sort by price 3 - sort by 
+        - gender : 1 - Men, 2 - Women, 3 - Boy, 4 -Girl
+      tags:
+        - Product
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: userId
+          required: false
+          schema:
+            type: string
+            example: 643d4d03ae23825006d11937
+        - in: query
+          name: brandIds
+          required: false
+          schema:
+            type: string
+            example: 643d4d03ae23825006d11937,643d4d03ae23825006d11937
+        - in: query
+          name: categoryIds
+          required: false
+          schema:
+            type: string
+            example: 643d4d03ae23825006d11937,643d4d03ae23825006d11937
+        - in: query
+          name: priceRange
+          required: false
+          schema:
+            type: string
+            example: 100-200
+        - in: query
+          name: discount
+          required: false
+          schema:
+            type: number
+            example: 5.5
+        - in: query
+          name: sortBy
+          required: false
+          schema:
+            type: number
+            example: 1
+        - in: query
+          name: perPage
+          required: false
+          schema:
+            type: number
+            example: 10
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          $ref: "#/components/responses/success"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedException"
+
+  /product/add:
+    post:
+      summary: Add Product
+      description: |
+        - Gender : 1 - Men, 2 - Women, 3 - Boy, 4 -Girl
+        - Take categoryIds and brandIds from their listing apis
+      tags:
+        - Product
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Prod 1
+                description:
+                  type: integer
+                  example: 1
+                gender:
+                  type: string
+                  example: "1,2"
+                price:
+                  type: number
+                  format: double
+                  example: 100.00
+                rating:
+                  type: number
+                  format: double
+                  example: 6.6
+                old_price:
+                  type: number
+                  format: double
+                  example: 100.00
+                discount:
+                  type: number
+                  format: double
+                  example: 5.5
+                colors:
+                  type: string
+                  example: red, green
+                brandIds:
+                  type: string
+                  example: o459548967409649604,84784597954983993
+                categoryIds:
+                  type: string
+                  example: o459548967409649604,84784597954983993
+                occasion:
+                  type: string
+                  example: abc
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        "200":
+          $ref: "#/components/responses/success"
+
+  /product/edit:
+    put:
+      summary: Edit Product
+      description: |
+        - Gender : 1 - Men, 2 - Women, 3 - Boy, 4 -Girl
+        - Take categoryIds and brandIds from their listing apis 
+        - if not want to edit than don't send key like(name or any) blank value and send Empty checkbox uncheck
+      tags:
+        - Product
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: productId
+          required: true
+          schema:
+            type: string
+            example: 66306c06bf3bbc56964fd772
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Prod 1
+                description:
+                  type: integer
+                  example: 1
+                gender:
+                  type: string
+                  example: "1,2"
+                price:
+                  type: number
+                  format: double
+                  example: 100.00
+                rating:
+                  type: number
+                  format: double
+                  example: 6.6
+                old_price:
+                  type: number
+                  format: double
+                  example: 100.00
+                discount:
+                  type: number
+                  format: double
+                  example: 5.5
+                colors:
+                  type: string
+                  example: red, green
+                brandIds:
+                  type: string
+                  example: 66306c06bf3bbc56964fd772,66306c06bf3bbc56964fd773
+                categoryIds:
+                  type: string
+                  example: 66306c06bf3bbc56964fd773,66306c06bf3bbc56964fd773
+                occasion:
+                  type: string
+                  example: abc
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        "200":
+          $ref: "#/components/responses/success"
+
+  /product/delete:
+    delete:
+      summary: Delete Product
+      tags:
+        - Product
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: productId
+          required: true
+          schema:
+            type: string
+            example: 66306c06bf3bbc56964fd772
+      responses:
+        "200":
+          $ref: "#/components/responses/success"
+
+  # /product:
+  #   get:
+  #     summary: Get user profile
+  #     description: |
+  #       - get user profile
+  #       - Language - [ 1 => English , 2 => French ]
+  #       - adminData related all parameters for Admin Panel
+  #     tags:
+  #       - Product
+  #     security:
+  #       - bearerAuth: []
+  #     parameters:
+  #       - in: query
+  #         name: userId
+  #         required: false
+  #         schema:
+  #           type: string
+  #           example: 64d1e688291421a69005a5f3
+  #     responses:
+  #       "200":
+  #         $ref: "#/components/responses/success"
+
+  /product/categories:
+    get:
+      summary: Get Categories
+      tags:
+        - Product
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/success"
+
+  /product/brands:
+    get:
+      summary: Get Brands
+      tags:
+        - Product
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/success"
